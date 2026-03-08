@@ -1,0 +1,8 @@
+{
+  "folders": [
+    { "path": "." }
+  ],
+  "settings": {
+    "workbench.settings.profile": "PHP Symfony"
+  }
+}
