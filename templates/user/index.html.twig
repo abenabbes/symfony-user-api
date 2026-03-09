@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des utilisateurs{% endblock %}
+
+{% block body %}
+<style>
+    .container { margin: 2em auto; max-width: 900px; width: 95%; font: 16px/1.5 sans-serif; }
+    table { width: 100%; border-collapse: collapse; margin-top: 1em; }
+    th, td { padding: 10px 15px; border: 1px solid #ddd; text-align: left; }
+    th { background-color: #4A90E2; color: white; }
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    .badge-active { background: #28a745; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+    .badge-inactive { background: #dc3545; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; }
+    .btn { padding: 6px 12px; border-radius: 4px; text-decoration: none; font-size: 14px; }
+    .btn-primary { background: #4A90E2; color: white; }
+</style>
+
+<div class="container">
+    <h1>👥 Liste des utilisateurs</h1>
+    <p>Total : <strong>{{ users|length }}</strong> utilisateur(s)</p>
+
+    {% if users is empty %}
+        <p>Aucun utilisateur trouvé.</p>
+    {% else %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nom</th>
+                    <th>Age</th>
+                    <th>Email</th>
+                    <th>Statut</th>
+                    <th>Créé le</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.age }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>
+                        {% if user.active %}
+                            <span class="badge-active">Actif</span>
+                        {% else %}
+                            <span class="badge-inactive">Inactif</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.createdAt ? user.createdAt|date('d/m/Y H:i') : '-' }}</td>
+                    <td>
+                        <a href="{{ path('app_user_show', {id: user.id}) }}" class="btn btn-primary">
+                            Voir
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>
+{% endblock %}
