@@ -7,16 +7,14 @@ use App\Entity\User;
 use App\Exception\InvalidUserDataException;
 use App\Exception\UserNotFoundException;
 use App\Repository\UserRepositoryInterface;
-
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class UserService
 {
-
-    // construct() — pour injecter des dépendances (ex: UserRepository)
     public function __construct(
-        private readonly UserRepositoryInterface $userRepository        
-    )
-    {}
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly ValidatorInterface      $validator,
+    ) {}
 
     // Méthode pour récupérer un utilisateur par ID
     public function findUserById(int $id): User
@@ -33,72 +31,64 @@ class UserService
     {
         return $this->userRepository->findAllUsers();
     }
-        
+
     // Méthode pour créer un utilisateur
     public function createUser(string $name, int $age, string $email): User
     {
-        // ✅ Règles métier ici — pas dans le Controller !
-        if (empty(trim($name))) {
-            throw new InvalidUserDataException("Le nom ne peut pas être vide.");
-        }
+        $user = (new User())
+            ->setName($name)
+            ->setAge($age)
+            ->setEmail($email);
 
-        if ($age <= 0 || $age > 150) {
-            throw new InvalidUserDataException("L'âge doit être entre 1 et 150.");
-        }
-
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            throw new InvalidUserDataException("L'email '$email' est invalide.");
-        }
-
-        $user = new User();
-        $user->setName($name);
-        $user->setAge($age);
-        $user->setEmail($email);
+        // ✅ Validation via les contraintes de l'entité User
+        $this->validate($user);
 
         return $this->userRepository->createUser($user);
     }
 
     // Méthode pour mettre à jour un utilisateur
-    public function updateUser(int $id, ?string $name, ?int $age,   ?string $email): User
+    public function updateUser(int $id, ?string $name, ?int $age, ?string $email): User
     {
-        $user = $this->findUserById($id); // Vérifie que l'utilisateur existe
+        $user = $this->findUserById($id);
 
-        if ($name !== null) {
-            if (empty(trim($name))) {
-                throw new InvalidUserDataException("Le nom ne peut pas être vide.");
-            }
-            $user->setName($name);
-        }
+        if ($name !== null)  $user->setName($name);
+        if ($age !== null)   $user->setAge($age);
+        if ($email !== null) $user->setEmail($email);
 
-        if ($age !== null) {
-            if ($age <= 0 || $age > 150) {
-                throw new InvalidUserDataException("L'âge doit être entre 1 et 150.");
-            }
-            $user->setAge($age);
-        }
+        // ✅ Validation via les contraintes de l'entité User
+        $this->validate($user);
 
-        if ($email !== null) {
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                throw new InvalidUserDataException("L'email '$email' est invalide.");
-            }
-            $user->setEmail($email);
-        }
-        
-        return $this->userRepository->updateUser($user);
+        $this->userRepository->updateUser($user);
+        return $user;
     }
 
-    // Méthode pour déactiver un utilisateur
+    // Méthode pour désactiver un utilisateur
     public function deactivateUser(int $id): User
     {
         $user = $this->findUserById($id);
         $user->setIsActive(false);
         $this->userRepository->updateUser($user);
         return $user;
-    }   
+    }
 
     // Méthode pour supprimer un utilisateur
-    public function deleteUser(User $user): void
+    public function deleteUser(int $id): void
     {
-            $this->userRepository->deleteUser($user);
-    }   
+        $user = $this->findUserById($id);
+        $this->userRepository->deleteUser($user);
+    }
+
+    // ✅ Méthode privée — valide l'entité et lance une exception si erreurs
+    private function validate(User $user): void
+    {
+        $violations = $this->validator->validate($user);
+
+        if (count($violations) > 0) {
+            $messages = [];
+            foreach ($violations as $violation) {
+                $messages[] = $violation->getMessage();
+            }
+            throw new InvalidUserDataException(implode(' | ', $messages));
+        }
+    }
 }
