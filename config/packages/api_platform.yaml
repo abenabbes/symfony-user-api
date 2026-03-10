@@ -1,0 +1,15 @@
+api_platform:
+    title: USER API CRUD operations for User entity
+    version: 1.0.0
+    defaults:
+        stateless: true
+        cache_headers:
+            vary: ['Content-Type', 'Authorization', 'Origin']
+    mapping:
+        paths:
+            - '%kernel.project_dir%/src/Entity'
+            - '%kernel.project_dir%/src/Controller'
+    swagger:
+        api_keys: []
+    openapi:
+        overrideResponses: false
