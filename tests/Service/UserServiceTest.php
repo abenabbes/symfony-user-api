@@ -14,7 +14,13 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationList;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-
+/**
+ * Tests unitaires pour la classe UserService : 
+ * - Pas de base de données
+ * - Tout est mocké
+ * - Ultra rapides (< 1ms par test)
+ * - Testent la logique métier uniquement
+ */
 class UserServiceTest extends TestCase
 {
     private UserService $userService;

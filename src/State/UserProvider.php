@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace App\State;
 
-use App\Entity\User;
 use App\Service\UserService;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\State\ProviderInterface;
+use App\Exception\UserNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserProvider implements ProviderInterface
 {
@@ -23,6 +24,10 @@ class UserProvider implements ProviderInterface
         }
 
         // Get → findUserById()
-        return $this->userService->findUserById((int) $uriVariables['id']);
+        try {
+            return $this->userService->findUserById((int) $uriVariables['id']);
+        } catch (UserNotFoundException $e) {
+            throw new NotFoundHttpException($e->getMessage());
+        }
     }
 }
