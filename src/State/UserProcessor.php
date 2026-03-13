@@ -12,6 +12,9 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\State\ProcessorInterface;
 
+// c'est le [ÉCRIVEUR] de données pour les ressources User.
+// Intervient sur les opérations POST, PUT, PATCH, DELETE   
+// Il reçoit les données de la requête (déjà désérialisées par API Platform) et les transmet au service
 class UserProcessor implements ProcessorInterface
 {
     public function __construct(

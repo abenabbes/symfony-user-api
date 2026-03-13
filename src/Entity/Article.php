@@ -3,11 +3,47 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
 use App\Repository\ArticleRepository;
+use App\State\ArticleProcessor;
+use App\State\ArticleProvider;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ArticleRepository::class)]
+#[ApiResource(
+    operations: [
+        new Get(
+            uriTemplate: '/articles/{id}',
+            provider: ArticleProvider::class,
+            extraProperties: ['standard_put' => false],
+        ),
+        new GetCollection(
+            uriTemplate: '/users/{userId}/articles',
+            uriVariables: [
+                'userId' => new \ApiPlatform\Metadata\Link(
+                    fromClass: User::class,
+                    identifiers: ['id']
+                ),
+            ],
+            provider: ArticleProvider::class
+        ),
+        new Post(
+            uriTemplate: '/users/{userId}/articles',
+            uriVariables: [
+                'userId' => new \ApiPlatform\Metadata\Link(
+                    fromClass: User::class,
+                    identifiers: ['id']
+                ),
+            ],
+            processor: ArticleProcessor::class,
+            read: false,
+        ),
+    ]
+)]
 class Article
 {
     // Initialisation automatique de createdAt

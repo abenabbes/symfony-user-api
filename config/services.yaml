@@ -25,3 +25,7 @@ services:
     # Lie l'interface à l'implémentation concrète
     # Quand Symfony voit UserRepositoryInterface → il injecte UserRepository
     App\Repository\UserRepositoryInterface: '@App\Repository\UserRepository'
+
+    # Lie l'interface à l'implémentation concrète
+    # Quand Symfony voit ArticleRepositoryInterface → il injecte ArticleRepository
+    App\Repository\ArticleRepositoryInterface: '@App\Repository\ArticleRepository'

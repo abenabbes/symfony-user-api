@@ -10,6 +10,11 @@ use ApiPlatform\State\ProviderInterface;
 use App\Exception\UserNotFoundException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+
+// c'est le [LECTEUR] de données pour les ressources User.
+// Intervient sur les opérations GET
+// Il récupère les données depuis le service et les retourne à API Platform
+// API Platform se charge ensuite de les sérialiser en JSON-LD
 class UserProvider implements ProviderInterface
 {
     public function __construct(
